@@ -1,5 +1,6 @@
 import MealItem from "./MealItem";
 import { useHttp } from "../hooks/useHttp";
+import Error from "./Error";
 
 const requestConfig = {
   method: "GET",
@@ -13,11 +14,11 @@ const Meals = () => {
   } = useHttp("http://localhost:3000/meals", requestConfig, []);
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <p className="center">Loading...</p>;
   }
 
-  if (!loadedMeals) {
-    return <p>No meals found.</p>;
+  if (error) {
+    return <Error title="Failed to load meals" message={error} />;
   }
 
   return (
