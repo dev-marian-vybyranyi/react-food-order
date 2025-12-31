@@ -1,6 +1,6 @@
 import { createContext, useReducer, useState } from "react";
 
-const CartContext = createContext({
+export const CartContext = createContext({
   items: [],
   addItem: (item) => {},
   removeItem: (id) => {},
@@ -37,7 +37,7 @@ function cartReducer(state, action) {
     const existingCartItem = state.items[existingCartItemIndex];
     const updatedItems = [...state.items];
 
-    if (existingCartItemIndex === 1) {
+    if (existingCartItem.quantity === 1) {
       updatedItems.splice(existingCartItemIndex, 1);
     } else {
       const updatedItem = {
@@ -70,7 +70,7 @@ export function CartContextProvider({ children }) {
     dispatchCartAction({ type: "REMOVE_ITEM", id });
   }
 
+  console.log(cartContext);
+
   return <CartContext value={cartContext}>{children}</CartContext>;
 }
-
-export default CartContext;
