@@ -20,7 +20,7 @@ const Checkout = () => {
   const cartCtx = useContext(CartContext);
   const userProgressCtx = useContext(UserProgressContext);
 
-  const { data, error, sendRequest } = useHttp(
+  const { data, error, sendRequest, clearData } = useHttp(
     "http://localhost:3000/orders",
     requestConfig
   );
@@ -36,6 +36,7 @@ const Checkout = () => {
   function handleFinish() {
     userProgressCtx.hideCheckout();
     cartCtx.clearCart();
+    clearData();
   }
 
   async function checkoutAction(prevState, fd) {
