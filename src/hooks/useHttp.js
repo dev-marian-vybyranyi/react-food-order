@@ -9,15 +9,15 @@ async function sendHttpRequest(url, config, initialData) {
     return resData;
 }
 
-export const useHttp = (url, config) => {
-    const [data, setData] = useState()
+export const useHttp = (url, config, initialData) => {
+    const [data, setData] = useState(initialData)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState()
 
-    const sendRequest = useCallback(async () => {
+    const sendRequest = useCallback(async (data) => {
         setIsLoading(true)
         try {
-            const resData = await sendHttpRequest(url, config)
+            const resData = await sendHttpRequest(url, { ...config, body: data })
             setData(resData)
         } catch (error) {
             setError(error.message || "Something went wrong!")
