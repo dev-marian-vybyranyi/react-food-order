@@ -7,6 +7,7 @@ import { currencyFormatter } from "../util/formatting";
 import Button from "./UI/Button";
 import Input from "./UI/Input";
 import Modal from "./UI/Modal";
+import { useActionState } from "react";
 
 const requestConfig = {
   method: "POST",
@@ -19,12 +20,10 @@ const Checkout = () => {
   const cartCtx = useContext(CartContext);
   const userProgressCtx = useContext(UserProgressContext);
 
-  const {
-    data,
-    isLoading: isSending,
-    error,
-    sendRequest,
-  } = useHttp("http://localhost:3000/orders", requestConfig);
+  const { data, error, sendRequest } = useHttp(
+    "http://localhost:3000/orders",
+    requestConfig
+  );
 
   const cartTotal = cartCtx.items.reduce((total, item) => {
     return total + item.price * item.quantity;
@@ -39,7 +38,7 @@ const Checkout = () => {
     cartCtx.clearCart();
   }
 
-  async function checkoutAction(fd) {
+  async function checkoutAction(prevState, fd) {
     const customerData = Object.fromEntries(fd.entries());
 
     await sendRequest(
@@ -52,6 +51,8 @@ const Checkout = () => {
     );
   }
 
+  const [formState, formAction, pending] = useActionState(checkoutAction, null);
+
   let actions = (
     <>
       <Button textOnly onClick={handleClose} type="button">
@@ -61,7 +62,7 @@ const Checkout = () => {
     </>
   );
 
-  if (isSending) {
+  if (pending) {
     actions = <p>Sending order...</p>;
   }
 
@@ -90,7 +91,7 @@ const Checkout = () => {
 
   return (
     <Modal open={userProgressCtx.progress === "checkout"}>
-      <form action={checkoutAction}>
+      <form action={formAction}>
         <h2>Checkout</h2>
         <p>Total Amount: {currencyFormatter.format(cartTotal)}</p>
         <Input label="Full Name" type="text" id="name" />
