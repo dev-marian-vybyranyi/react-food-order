@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { useHttp } from "../hooks/useHttp";
 import { CartContext } from "../store/CartContext";
 import { UserProgressContext } from "../store/UserProgressContext";
+import Error from "./Error";
 import { currencyFormatter } from "../util/formatting";
 import Button from "./UI/Button";
 import Input from "./UI/Input";
@@ -38,13 +39,10 @@ const Checkout = () => {
     cartCtx.clearCart();
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    const fd = new FormData(event.target);
+  async function checkoutAction(fd) {
     const customerData = Object.fromEntries(fd.entries());
 
-    sendRequest(
+    await sendRequest(
       JSON.stringify({
         order: {
           items: cartCtx.items,
@@ -65,6 +63,10 @@ const Checkout = () => {
 
   if (isSending) {
     actions = <p>Sending order...</p>;
+  }
+
+  if (error) {
+    actions = <Error title="Failed to submit order" message={error} />;
   }
 
   if (data && !error) {
@@ -88,7 +90,7 @@ const Checkout = () => {
 
   return (
     <Modal open={userProgressCtx.progress === "checkout"}>
-      <form onSubmit={handleSubmit}>
+      <form action={checkoutAction}>
         <h2>Checkout</h2>
         <p>Total Amount: {currencyFormatter.format(cartTotal)}</p>
         <Input label="Full Name" type="text" id="name" />
